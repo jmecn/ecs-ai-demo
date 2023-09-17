@@ -1,0 +1,14 @@
+.DS_Store
+.classpath
+.project
+.idea/
+*.iml
+*.dylib
+*.dll
+*.so
+**/logs/
+**/target/
+**/build/
+**/gen/
+**/.flattened-pom.xml
+**/pom.xml.versionsBackup

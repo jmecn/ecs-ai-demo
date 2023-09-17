@@ -1,0 +1,24 @@
+MaterialDef CheckerBoard {
+
+    MaterialParameters {
+        Color Color (Color)
+        Float CellSize
+    }
+
+    Technique {
+        VertexShader GLSL310 GLSL300 GLSL100 GLSL150:   MatDefs/Tool/CheckerBoard.vert
+        FragmentShader GLSL310 GLSL300 GLSL100 GLSL150: MatDefs/Tool/CheckerBoard.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            WorldMatrix
+            ViewProjectionMatrix
+            ViewMatrix
+        }
+
+        Defines {
+            HAS_COLOR : Color
+            HAS_CELL_SIZE : CellSize
+        }
+    }
+}
