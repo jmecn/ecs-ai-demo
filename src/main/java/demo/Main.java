@@ -15,6 +15,7 @@ import com.simsilica.es.base.DefaultEntityData;
 import com.simsilica.sim.common.DecaySystem;
 import com.simsilica.state.GameSystemsState;
 import demo.appstate.DebugAoiRadiusState;
+import demo.appstate.DebugFollowState;
 import demo.component.*;
 import demo.appstate.CheckerBoardState;
 import demo.appstate.ModelViewState;
@@ -48,6 +49,7 @@ public class Main extends SimpleApplication {
                 new GameSystemsState(),
                 new ModelViewState(),
                 new DebugAoiRadiusState(),
+                new DebugFollowState(),
                 new FlyCamAppState()
         );
     }

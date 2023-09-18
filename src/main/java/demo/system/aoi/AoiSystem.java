@@ -1,6 +1,5 @@
 package demo.system.aoi;
 
-import com.jme3.math.Vector3f;
 import com.simsilica.es.*;
 import com.simsilica.es.common.Decay;
 import com.simsilica.sim.AbstractGameSystem;
@@ -220,26 +219,20 @@ public class AoiSystem extends AbstractGameSystem {
 
     private void lostTarget(Entity mob) {
         Follow follow = ed.getComponent(mob.getId(), Follow.class);
-        if (follow != null && follow.getLine() != null) {
-            ed.removeEntity(follow.getLine());
+        if (follow != null) {
+            ed.removeComponent(mob.getId(), Speed.class);
+            ed.removeComponent(mob.getId(), Follow.class);
         }
-
-        ed.removeComponent(mob.getId(), Speed.class);
-        ed.removeComponent(mob.getId(), Follow.class);
     }
 
     private void crashTarget(Entity entity) {
-        Follow follow = ed.getComponent(entity.getId(), Follow.class);
-        if (follow != null && follow.getLine() != null) {
-            ed.removeEntity(follow.getLine());
-            ed.removeComponent(entity.getId(), Follow.class);
-        }
-
         // mob被撞死
         if (ed.getComponent(entity.getId(), Decay.class) == null) {
             leave(entity);// 从AOI中移除
             ed.setComponent(entity.getId(), new Decay());
-            log.info("crash entity:{}", entity.getId());
+            if (log.isDebugEnabled()) {
+                log.debug("crash entity:{}", entity.getId());
+            }
         }
     }
 
@@ -247,31 +240,12 @@ public class AoiSystem extends AbstractGameSystem {
 
         ed.setComponents(mob.getId(), new Speed(Constants.ORANGE_TEAM_SPEED));
 
+        // 是否已经有target
         Follow follow = ed.getComponent(mob.getId(), Follow.class);
-        EntityId line;
-        if (follow == null) {
-            line = createLineEntity(mob);
-        } else {
-            line = follow.getLine();
-            if (line == null) {
-                line = createLineEntity(mob);
-            }
+        if (follow != null && Objects.equals(targetPlayer.getId(), follow.getTarget())) {
+            return;
         }
-        ed.setComponents(mob.getId(), new Follow(targetPlayer.getId(), line));
-    }
-
-    private EntityId createLineEntity(Entity mob) {
-        EntityId line = ed.createEntity();
-
-        Vector3f mobPosition = mob.get(Position.class).getLocation();
-
-        ed.setComponent(line, new Position(mobPosition));
-        ed.setComponent(line, ed.getComponent(mob.getId(), Rotation.class));
-        ed.setComponent(line, new Scale());
-        ed.setComponent(line, new Model(Constants.DEBUG_SEGMENT));
-        ed.setComponent(line, new Attach(mob.getId()));
-
-        return line;
+        ed.setComponents(mob.getId(), new Follow(targetPlayer.getId()));
     }
 
     @Override

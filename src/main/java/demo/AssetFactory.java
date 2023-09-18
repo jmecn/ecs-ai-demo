@@ -51,18 +51,9 @@ public class AssetFactory {
             mat.setColor("Color", color);
         }
 
-        if (name.equals(Constants.BLUE_TEAM)) {
-            mat.getAdditionalRenderState().setPolyOffset(1f, 1f);
-        }
-        else if (name.equals(Constants.DEBUG_SEGMENT)) {
-            mat.getAdditionalRenderState().setDepthTest(false);
-            mat.getAdditionalRenderState().setDepthWrite(true);
-            mat.getAdditionalRenderState().setColorWrite(true);
-        }
-        else if (name.equals(Constants.DEBUG_RADIUS)) {
-            mat.getAdditionalRenderState().setDepthTest(false);
-            mat.getAdditionalRenderState().setDepthWrite(true);
-            mat.getAdditionalRenderState().setColorWrite(true);
+        switch (name) {
+            case Constants.BLUE_TEAM -> mat.getAdditionalRenderState().setPolyOffset(1f, 1f);
+            case Constants.DEBUG_SEGMENT, Constants.DEBUG_RADIUS -> mat.getAdditionalRenderState().setDepthTest(false);
         }
 
         materials.put(name, mat);
@@ -109,21 +100,18 @@ public class AssetFactory {
         if(Constants.BLUE_TEAM.equals(name) ) {
             Geometry geom = new Geometry(name, createMesh(name));
             geom.setMaterial(createMaterial(name, ColorRGBA.Blue, true));
-            geom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
             model.attachChild(geom);
         } else if(Constants.ORANGE_TEAM.equals(name) ) {
             Geometry geom = new Geometry(name, createMesh(name));
             geom.setMaterial(createMaterial(name, ColorRGBA.Orange, true));
-            geom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
             model.attachChild(geom);
         } else if(Constants.BULLET.equals(name) ) {
             Geometry geom = new Geometry(name, createMesh(name));
             geom.setMaterial(createMaterial(name, ColorRGBA.Yellow, true));
-            geom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
             model.attachChild(geom);
         } else if(Constants.DEBUG_SEGMENT.equals(name) ) {
             Geometry geom = new Geometry(name, createMesh(name));
-            geom.setMaterial(createMaterial(name, ColorRGBA.Red, false));
+            geom.setMaterial(createMaterial(name, ColorRGBA.Green, false));
             model.attachChild(geom);
         } else if(Constants.DEBUG_RADIUS.equals(name) ) {
             Geometry geom = new Geometry(name, createMesh(name));

@@ -18,10 +18,7 @@ public class Follow implements EntityComponent {
     @Setter
     private EntityId target;
 
-    private final EntityId line;
-
-    public Follow(EntityId target, EntityId line) {
+    public Follow(EntityId target) {
         this.target = target;
-        this.line = line;
     }
 }

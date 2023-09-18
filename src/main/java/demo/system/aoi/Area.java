@@ -36,7 +36,9 @@ public class Area {
     }
 
     public void enter(Entity entity, String group) {
-        log.info("enter: {}, {}, {}, {}, {}", group, entity.getId(), x, y, z);
+        if (log.isDebugEnabled()) {
+            log.debug("enter: {}, {}, {}, {}, {}", group, entity.getId(), x, y, z);
+        }
         String existGroup = entityGroups.remove(entity);
         if (existGroup != null) {
             leave(entity, existGroup);
@@ -47,7 +49,9 @@ public class Area {
     }
 
     public void leave(Entity entity, String group) {
-        log.info("leave: {}, {}, {}, {}, {}", group, entity.getId(), x, y, z);
+        if (log.isDebugEnabled()) {
+            log.debug("leave: {}, {}, {}, {}, {}", group, entity.getId(), x, y, z);
+        }
         Set<Entity> ids = children.get(group);
         if (ids != null) {
             ids.remove(entity);

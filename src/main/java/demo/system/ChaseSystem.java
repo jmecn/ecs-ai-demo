@@ -42,11 +42,6 @@ public class ChaseSystem extends AbstractGameSystem {
             Vector3f dir = loc2.subtract(loc1);
             dir.normalizeLocal();
             ed.setComponents(e.getId(), new Rotation(new Quaternion().lookAt(dir, Vector3f.UNIT_Y)));
-
-            if (follow.getLine() != null) {
-                float dist = FastMath.sqrt(loc2.distanceSquared(loc1));
-                ed.setComponent(follow.getLine(), new Scale(dist, dist, dist));
-            }
         }
     }
 
