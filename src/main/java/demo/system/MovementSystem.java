@@ -6,7 +6,7 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
 import com.simsilica.sim.AbstractGameSystem;
 import com.simsilica.sim.SimTime;
-import demo.component.Position;
+import demo.component.Transform;
 import demo.component.Velocity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +25,7 @@ public class MovementSystem extends AbstractGameSystem {
     @Override
     protected void initialize() {
         ed = getSystem(EntityData.class, true);
-        entities = ed.getEntities(Velocity.class, Position.class);
+        entities = ed.getEntities(Velocity.class, Transform.class);
     }
 
     @Override
@@ -38,11 +38,11 @@ public class MovementSystem extends AbstractGameSystem {
 
     private void updatePosition(Entity entity, SimTime time) {
         Velocity velocity = entity.get(Velocity.class);
-        Position position = entity.get(Position.class);
+        Transform transform = entity.get(Transform.class);
 
         velocity.getVelocity().mult((float) time.getTpf(), step);
-        position.getLocation().addLocal(step);
-        ed.setComponent(entity.getId(), position);
+        transform.getPosition().addLocal(step);
+        ed.setComponent(entity.getId(), transform);
     }
 
     @Override

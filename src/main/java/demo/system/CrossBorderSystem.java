@@ -1,12 +1,13 @@
 package demo.system;
 
+import com.jme3.math.Vector3f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
 import com.simsilica.sim.AbstractGameSystem;
 import com.simsilica.sim.SimTime;
 import demo.Constants;
-import demo.component.Position;
+import demo.component.Transform;
 
 /**
  * desc:
@@ -32,7 +33,7 @@ public class CrossBorderSystem extends AbstractGameSystem {
     @Override
     protected void initialize() {
         ed = getSystem(EntityData.class);
-        entities = ed.getEntities(Position.class);
+        entities = ed.getEntities(Transform.class);
     }
 
     public void update(SimTime time) {
@@ -43,18 +44,27 @@ public class CrossBorderSystem extends AbstractGameSystem {
     }
 
     private void update(Entity entity) {
-        // TODO 如果超出边界，需要做什么处理？
-        Position position = entity.get(Position.class);
-        if (position.getLocation().x > radius) {
-            position.getLocation().x = -radius;
-        } else if (position.getLocation().x < -radius) {
-            position.getLocation().x = radius;
+        Transform transform = entity.get(Transform.class);
+        Vector3f location = transform.getPosition();
+        boolean needUpdate = false;
+        if (location.x > radius) {
+            location.x = -radius;
+            needUpdate = true;
+        } else if (transform.getPosition().x < -radius) {
+            location.x = radius;
+            needUpdate = true;
         }
 
-        if (position.getLocation().z > radius) {
-            position.getLocation().z = -radius;
-        } else if (position.getLocation().z < -radius) {
-            position.getLocation().z = radius;
+        if (location.z > radius) {
+            location.z = -radius;
+            needUpdate = true;
+        } else if (transform.getPosition().z < -radius) {
+            location.z = radius;
+            needUpdate = true;
+        }
+
+        if (needUpdate) {
+            ed.setComponent(entity.getId(),transform);
         }
     }
 

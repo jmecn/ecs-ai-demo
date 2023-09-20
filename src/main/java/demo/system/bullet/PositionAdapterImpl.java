@@ -34,26 +34,37 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package demo.component;
+package demo.system.bullet;
 
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.simsilica.bullet.debug.PositionAdapter;
+import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;
-import lombok.Getter;
-import lombok.ToString;
+import demo.component.Transform;
 
-@Getter
-@ToString
-public class Position implements EntityComponent {
-    private Vector3f location;
+/**
+ *  
+ *
+ *  @author    Paul Speed
+ */
+public class PositionAdapterImpl implements PositionAdapter {
 
-    protected Position() {
+    public PositionAdapterImpl() {
+    }
+ 
+    @Override  
+    public Class<? extends EntityComponent> getComponentType() {
+        return Transform.class;
+    }
+        
+    @Override  
+    public Vector3f getLocation( Entity e, int status ) {
+        return e.get(Transform.class).getPosition();
     }
     
-    public Position( double x, double y, double z ) {
-        this(new Vector3f((float)x, (float)y, (float)z));
-    }
-
-    public Position( Vector3f location) {
-        this.location = location;
-    }
+    @Override  
+    public Quaternion getOrientation( Entity e, int status ) {
+        return e.get(Transform.class).getRotation();
+    } 
 }

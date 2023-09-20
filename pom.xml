@@ -16,10 +16,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lombok.version>1.18.20</lombok.version>
-        <guava.version>27.0.1-jre</guava.version>
+        <guava.version>32.1.2-jre</guava.version>
         <protobuf.version>3.9.0</protobuf.version>
         <zxing.version>3.4.0</zxing.version>
         <jme3.version>3.6.1-stable</jme3.version>
+        <lwjgl.version>3.3.2</lwjgl.version>
         <minie.version>7.7.0+big3</minie.version>
         <recast4j.version>1.5.6</recast4j.version>
     </properties>
@@ -29,6 +30,10 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
 
         <!-- jme3 -->
@@ -65,12 +70,30 @@
         <dependency>
             <groupId>com.simsilica</groupId>
             <artifactId>sio2</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- lemur -->
         <dependency>
             <groupId>com.simsilica</groupId>
             <artifactId>lemur</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
         </dependency>
 
         <!-- 日志 -->
@@ -82,6 +105,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

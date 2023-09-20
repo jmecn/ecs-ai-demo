@@ -15,8 +15,8 @@ import com.simsilica.state.GameSystemsState;
 import demo.AssetFactory;
 import demo.Constants;
 import demo.Main;
-import demo.component.*;
-import demo.system.aoi.Aoi;
+import demo.component.Follow;
+import demo.component.Transform;
 
 /**
  * desc:
@@ -84,14 +84,14 @@ public class DebugFollowState extends BaseAppState {
             Follow follow = entity.get(Follow.class);
             EntityId target = follow.getTarget();
 
-            Position position = entity.get(Position.class);
-            Position targetPosition = ed.getComponent(target, Position.class);
-            if (targetPosition == null) {
+            Transform transform = entity.get(Transform.class);
+            Transform targetTransform = ed.getComponent(target, Transform.class);
+            if (targetTransform == null) {
                 return;
             }
 
-            Vector3f loc1 = position.getLocation();
-            Vector3f loc2 = targetPosition.getLocation();
+            Vector3f loc1 = transform.getPosition();
+            Vector3f loc2 = targetTransform.getPosition();
 
             // 计算Facing
             Vector3f dir = loc2.subtract(loc1);
@@ -111,7 +111,7 @@ public class DebugFollowState extends BaseAppState {
 
     private class ModelContainer extends EntityContainer<ModelView> {
         public ModelContainer( EntityData ed ) {
-            super(ed, Position.class, Follow.class);
+            super(ed, Transform.class, Follow.class);
         }
 
         @Override

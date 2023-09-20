@@ -1,7 +1,8 @@
 package demo.system.aoi;
 
+import com.google.common.base.Stopwatch;
+import com.jme3.math.Vector3f;
 import com.simsilica.es.*;
-import com.simsilica.es.common.Decay;
 import com.simsilica.sim.AbstractGameSystem;
 import com.simsilica.sim.SimTime;
 import demo.Constants;
@@ -9,7 +10,6 @@ import demo.component.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * desc:
@@ -23,6 +23,12 @@ public class AoiSystem extends AbstractGameSystem {
     private final int cellSize;
 
     private final Map<Long, Area> areas = new HashMap<>();
+
+    private final Map<EntityId, Aoi> entityAoiMap = new HashMap<>();
+
+    private int cacheMiss = 0;
+    private int cacheHit = 0;
+    private final Map<String, Set<Entity>> cachedNearByEntities = new HashMap<>();
 
     private EntityData ed;
     private EntitySet entities;
@@ -38,7 +44,7 @@ public class AoiSystem extends AbstractGameSystem {
     @Override
     protected void initialize() {
         ed = getSystem(EntityData.class);
-        entities = ed.getEntities(Position.class, Aoi.class);
+        entities = ed.getEntities(Transform.class, Aoi.class);
 
         for (Entity entity : entities) {
             updateAoi(entity);
@@ -58,18 +64,18 @@ public class AoiSystem extends AbstractGameSystem {
             leave(entity);
         }
 
-        updateMobPlayerCollision();
-        updateBulletPlayerCollision();
+        // 清空缓存
+        invalidateNearByCache();
     }
 
     private void updateAoi(Entity entity) {
-        Position position = entity.get(Position.class);
+        Transform transform = entity.get(Transform.class);
         Aoi aoi = entity.get(Aoi.class);
 
         // 计算当前位置所在的区域
-        int x = (int) (position.getLocation().x / cellSize);
-        int y = (int) (position.getLocation().y / cellSize);
-        int z = (int) (position.getLocation().z / cellSize);
+        int x = (int) (transform.getPosition().x / cellSize);
+        int y = (int) (transform.getPosition().y / cellSize);
+        int z = (int) (transform.getPosition().z / cellSize);
         long key = Area.toLong(x, y, z);
 
         Long curAreaId = aoi.getAreaId();
@@ -80,28 +86,42 @@ public class AoiSystem extends AbstractGameSystem {
 
         // 离开旧区域
         if (curAreaId != null) {
-            Area area = areas.get(curAreaId);
-            if (area != null) {
-                area.leave(entity, aoi.getGroup());
-            }
+            leave(entity);
         }
 
         // 进入新区域
-        Area area = areas.computeIfAbsent(key, k -> new Area(key, x, y, z));
+        Area area = areas.get(key);
+        if (area == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("create area:({}, {})", x, z);
+            }
+            area = new Area(key, x, y, z);
+            areas.put(key, area);
+        }
+
         area.enter(entity, aoi.getGroup());
 
         // 更新 Aoi 组件
         aoi.setArea(key, x, y, z);
         ed.setComponent(entity.getId(), aoi);
+
+        entityAoiMap.put(entity.getId(), aoi);
+
+        if (log.isDebugEnabled()) {
+            log.debug("enter:{}, ({}, {})", entity.getId(), aoi.getX(), aoi.getZ());
+        }
     }
 
     private void leave(Entity entity) {
-        Aoi aoi = entity.get(Aoi.class);
+        Aoi aoi = entityAoiMap.get(entity.getId());
         if (aoi == null) {
             return;
         }
 
-        log.info("leave:{}", entity.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("leave:{}, ({}, {})", entity.getId(), aoi.getX(), aoi.getZ());
+        }
+
         Long curAreaId = aoi.getAreaId();
         if (curAreaId != null) {
             Area area = areas.get(curAreaId);
@@ -112,90 +132,37 @@ public class AoiSystem extends AbstractGameSystem {
 
         // 更新 Aoi 组件
         aoi.setArea(null, 0, 0, 0);
+        entityAoiMap.remove(entity.getId());
     }
 
-    private void updateBulletPlayerCollision() {
-        Collection<Entity> bullets = entities.stream()
-                .filter(e -> Constants.BULLET.equals(e.get(Aoi.class).getGroup()))
-                .collect(Collectors.toSet());
+    private void invalidateNearByCache() {
 
-        for (Entity bullet : bullets) {
-            Position bulletPosition = bullet.get(Position.class);
-            Aoi aoi = bullet.get(Aoi.class);
+        if (!cachedNearByEntities.isEmpty()) {
+            cachedNearByEntities.clear();
 
-            float distance = Float.MAX_VALUE;
-            Position targetPosition = null;
-            Entity targetPlayer = null;
-
-            // 计算当前位置所在的区域
-            Set<Entity> players = getNearByGroupEntities(aoi, Constants.BLUE_TEAM);
-
-            for (Entity player : players) {
-                Position playerPosition = player.get(Position.class);
-
-                float d = playerPosition.getLocation().distanceSquared(bulletPosition.getLocation());
-                if (d > aoi.getRadiusSquared()) {
-                    continue;
-                }
-                if (d < distance) {
-                    distance = d;
-                    targetPosition = playerPosition;
-                    targetPlayer = player;
+            if (log.isDebugEnabled()) {
+                if (cacheHit + cacheMiss > 0) {
+                    log.debug("cache hit rate:{}%, total query:{}", cacheHit * 100.0f / (cacheHit + cacheMiss), cacheHit + cacheMiss);
                 }
             }
 
-            if (targetPosition != null) {
-                crashTarget(bullet);
-                crashTarget(targetPlayer);
-            }
+            cacheHit = 0;
+            cacheMiss = 0;
         }
     }
 
-    private void updateMobPlayerCollision() {
-        Collection<Entity> mobs = entities.stream()
-                .filter(e -> Constants.ORANGE_TEAM.equals(e.get(Aoi.class).getGroup()))
-                .collect(Collectors.toSet());
+    public Set<Entity> getNearByGroupEntities(Aoi aoi, String group) {
+        String groupKey = String.format("%s:%x", group, aoi.getAreaId());
 
-        for (Entity mob : mobs) {
-            Position mobPosition = mob.get(Position.class);
-            Aoi aoi = mob.get(Aoi.class);
-
-            float distance = Float.MAX_VALUE;
-            Position targetPosition = null;
-            Entity targetPlayer = null;
-
-            // 计算当前位置所在的区域
-            Set<Entity> players = getNearByGroupEntities(aoi, Constants.BLUE_TEAM);
-
-            // 碰撞检测
-            for (Entity player : players) {
-                Position playerPosition = player.get(Position.class);
-
-                float d = playerPosition.getLocation().distanceSquared(mobPosition.getLocation());
-                if (d > aoi.getRadiusSquared()) {
-                    continue;
-                }
-                if (d < distance) {
-                    distance = d;
-                    targetPosition = playerPosition;
-                    targetPlayer = player;
-                }
-            }
-
-            if (targetPosition == null) {
-                lostTarget(mob);
-            } else {
-                if (distance <= Constants.BLUE_AOI_RADIUS_SQUARED) {
-                    crashTarget(mob);
-                } else {
-                    followTarget(mob, targetPlayer);
-                }
-            }
+        // 缓存当前帧对最邻近区域的查询结果，减少查询次数。
+        if (cachedNearByEntities.containsKey(groupKey)) {
+            cacheHit++;
+            return cachedNearByEntities.get(groupKey);
         }
-    }
+        cacheMiss++;
 
-    private Set<Entity> getNearByGroupEntities(Aoi aoi, String group) {
         Set<Entity> set = new HashSet<>();
+
         // 计算当前位置所在的区域
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -214,38 +181,10 @@ public class AoiSystem extends AbstractGameSystem {
                 set.addAll(members);
             }
         }
+
+        // 缓存这一帧的查询结果
+        cachedNearByEntities.put(groupKey, set);
         return set;
-    }
-
-    private void lostTarget(Entity mob) {
-        Follow follow = ed.getComponent(mob.getId(), Follow.class);
-        if (follow != null) {
-            ed.removeComponent(mob.getId(), Speed.class);
-            ed.removeComponent(mob.getId(), Follow.class);
-        }
-    }
-
-    private void crashTarget(Entity entity) {
-        // mob被撞死
-        if (ed.getComponent(entity.getId(), Decay.class) == null) {
-            leave(entity);// 从AOI中移除
-            ed.setComponent(entity.getId(), new Decay());
-            if (log.isDebugEnabled()) {
-                log.debug("crash entity:{}", entity.getId());
-            }
-        }
-    }
-
-    private void followTarget(Entity mob, Entity targetPlayer) {
-
-        ed.setComponents(mob.getId(), new Speed(Constants.ORANGE_TEAM_SPEED));
-
-        // 是否已经有target
-        Follow follow = ed.getComponent(mob.getId(), Follow.class);
-        if (follow != null && Objects.equals(targetPlayer.getId(), follow.getTarget())) {
-            return;
-        }
-        ed.setComponents(mob.getId(), new Follow(targetPlayer.getId()));
     }
 
     @Override

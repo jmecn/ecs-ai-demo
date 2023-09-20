@@ -8,10 +8,8 @@ import com.simsilica.es.*;
 import com.simsilica.state.GameSystemsState;
 import demo.Main;
 import demo.AssetFactory;
-import demo.component.Rotation;
 import demo.component.Model;
-import demo.component.Position;
-import demo.component.Scale;
+import demo.component.Transform;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -76,14 +74,9 @@ public class ModelViewState extends BaseAppState {
         }
         
         public void update() {
-            Position pos = entity.get(Position.class);
-            Rotation rotation = entity.get(Rotation.class);
-            spatial.setLocalTranslation(pos.getLocation());
-            spatial.setLocalRotation(rotation.getRotation());
-            Scale scale = ed.getComponent(entity.getId(), Scale.class);
-            if (scale != null) {
-                spatial.setLocalScale(scale.getScale());
-            }
+            Transform transform = entity.get(Transform.class);
+            spatial.setLocalTranslation(transform.getPosition());
+            spatial.setLocalRotation(transform.getRotation());
         }
 
         public void release() {
@@ -93,7 +86,7 @@ public class ModelViewState extends BaseAppState {
     
     private class ModelContainer extends EntityContainer<ModelView> {
         public ModelContainer( EntityData ed ) {
-            super(ed, Position.class, Rotation.class, Model.class);
+            super(ed, Transform.class, Model.class);
         }
  
         @Override       

@@ -1,6 +1,5 @@
 package demo.system;
 
-import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.simsilica.es.*;
@@ -22,7 +21,7 @@ public class ChaseSystem extends AbstractGameSystem {
     @Override
     protected void initialize() {
         ed = getSystem(EntityData.class);
-        entities = ed.getEntities(Position.class, Follow.class);
+        entities = ed.getEntities(Transform.class, Follow.class);
     }
 
     public void update(SimTime time) {
@@ -32,16 +31,18 @@ public class ChaseSystem extends AbstractGameSystem {
             Follow follow = e.get(Follow.class);
             EntityId target = follow.getTarget();
 
-            Position position = e.get(Position.class);
-            Position targetPosition = ed.getComponent(target, Position.class);
+            Transform transform = e.get(Transform.class);
+            Transform targetPosition = ed.getComponent(target, Transform.class);
 
-            Vector3f loc1 = position.getLocation();
-            Vector3f loc2 = targetPosition.getLocation();
+            Vector3f loc1 = transform.getPosition();
+            Vector3f loc2 = targetPosition.getPosition();
 
             // 计算Facing
             Vector3f dir = loc2.subtract(loc1);
             dir.normalizeLocal();
-            ed.setComponents(e.getId(), new Rotation(new Quaternion().lookAt(dir, Vector3f.UNIT_Y)));
+
+            // 计算Transform
+            ed.setComponents(e.getId(), new Transform(loc1, new Quaternion().lookAt(dir, Vector3f.UNIT_Y)));
         }
     }
 

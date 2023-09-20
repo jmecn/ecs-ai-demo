@@ -2,22 +2,15 @@ package demo.appstate;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.debug.WireSphere;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityContainer;
 import com.simsilica.es.EntityData;
-import com.simsilica.es.EntitySet;
 import com.simsilica.state.GameSystemsState;
 import demo.AssetFactory;
 import demo.Constants;
-import demo.component.Model;
-import demo.component.Position;
-import demo.component.Rotation;
-import demo.component.Scale;
+import demo.component.Transform;
 import demo.system.aoi.Aoi;
 import demo.Main;
 
@@ -73,11 +66,6 @@ public class DebugAoiRadiusState extends BaseAppState {
         models.stop();
     }
 
-
-    protected Spatial getModel(Model info) {
-        return factory.loadModel(info.getName());
-    }
-
     private class ModelView {
         private final Entity entity;
         private final Spatial spatial;
@@ -92,8 +80,8 @@ public class DebugAoiRadiusState extends BaseAppState {
         }
 
         public void update() {
-            Position pos = entity.get(Position.class);
-            spatial.setLocalTranslation(pos.getLocation());
+            Transform transform = entity.get(Transform.class);
+            spatial.setLocalTranslation(transform.getPosition());
         }
 
         public void release() {
@@ -103,7 +91,7 @@ public class DebugAoiRadiusState extends BaseAppState {
 
     private class ModelContainer extends EntityContainer<ModelView> {
         public ModelContainer( EntityData ed ) {
-            super(ed, Position.class, Aoi.class);
+            super(ed, Transform.class, Aoi.class);
         }
 
         @Override

@@ -7,8 +7,8 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
 import com.simsilica.sim.AbstractGameSystem;
 import com.simsilica.sim.SimTime;
-import demo.component.Rotation;
 import demo.component.Speed;
+import demo.component.Transform;
 import demo.component.Velocity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class VelocitySystem extends AbstractGameSystem {
     @Override
     protected void initialize() {
         ed = getSystem(EntityData.class);
-        entities = ed.getEntities(Speed.class, Rotation.class);
+        entities = ed.getEntities(Speed.class, Transform.class);
 
         // init velocity
         for (Entity entity : entities) {
@@ -55,8 +55,8 @@ public class VelocitySystem extends AbstractGameSystem {
             return;
         }
 
-        Rotation facing = entity.get(Rotation.class);
-        Quaternion rotation = facing.getRotation();
+        Transform transform = entity.get(Transform.class);
+        Quaternion rotation = transform.getRotation();
 
         Velocity velocity = ed.getComponent(entity.getId(), Velocity.class);
         Vector3f dir;

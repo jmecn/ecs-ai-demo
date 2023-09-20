@@ -29,4 +29,5 @@ public class Aoi implements EntityComponent {
         this.y = y;
         this.z = z;
     }
+
 }

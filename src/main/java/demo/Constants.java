@@ -11,7 +11,7 @@ public final class Constants {
     }
 
     public static final float MAP_SIZE = 256f;
-
+    public static final float MAP_SIZE_HALF = MAP_SIZE * 0.5f;
     public static final int CELL_SIZE = 8;
 
     public static final int BLUE_TEAM_COUNT = 1000;
