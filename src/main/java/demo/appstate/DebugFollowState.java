@@ -2,6 +2,10 @@ package demo.appstate;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.input.InputManager;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -24,7 +28,9 @@ import demo.component.Transform;
  * @author yanmaoyuan
  * @date 2023/9/17
  */
-public class DebugFollowState extends BaseAppState {
+public class DebugFollowState extends BaseAppState implements ActionListener {
+
+    public static final String TOGGLE_FOLLOW = "toggle_follow";
 
     private EntityData ed;
 
@@ -57,6 +63,30 @@ public class DebugFollowState extends BaseAppState {
     @Override
     protected void onEnable() {
         models.start();
+
+        // 注册按键
+        InputManager inputManager = getApplication().getInputManager();
+        inputManager.addMapping(TOGGLE_FOLLOW, new KeyTrigger(KeyInput.KEY_F2));
+        inputManager.addListener(this, TOGGLE_FOLLOW);
+    }
+
+
+    @Override
+    public void onAction(String name, boolean keyPressed, float tpf) {
+        if (name.equals(TOGGLE_FOLLOW) && keyPressed) {
+            toggleFollow();
+        }
+    }
+
+    /**
+     * 跟踪指向开/关
+     */
+    public void toggleFollow() {
+        if (rootNode.hasChild(root)) {
+            rootNode.detachChild(root);
+        } else {
+            rootNode.attachChild(root);
+        }
     }
 
     @Override

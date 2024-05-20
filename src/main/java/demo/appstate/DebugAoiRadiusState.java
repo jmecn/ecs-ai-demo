@@ -1,7 +1,12 @@
 package demo.appstate;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.input.InputManager;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
@@ -20,7 +25,9 @@ import demo.Main;
  * @author yanmaoyuan
  * @date 2023/9/17
  */
-public class DebugAoiRadiusState extends BaseAppState {
+public class DebugAoiRadiusState extends BaseAppState implements ActionListener {
+
+    public static final String TOGGLE_RADIUS = "toggle_radius";
 
     private EntityData ed;
 
@@ -54,6 +61,30 @@ public class DebugAoiRadiusState extends BaseAppState {
     @Override
     protected void onEnable() {
         models.start();
+
+        // 注册按键
+        InputManager inputManager = getApplication().getInputManager();
+        inputManager.addMapping(TOGGLE_RADIUS, new KeyTrigger(KeyInput.KEY_F3));
+        inputManager.addListener(this, TOGGLE_RADIUS);
+    }
+
+
+    @Override
+    public void onAction(String name, boolean keyPressed, float tpf) {
+        if (name.equals(TOGGLE_RADIUS) && keyPressed) {
+            toggleRadius();
+        }
+    }
+
+    /**
+     * 碰撞半径开/关
+     */
+    public void toggleRadius() {
+        if (rootNode.hasChild(root)) {
+            rootNode.detachChild(root);
+        } else {
+            rootNode.attachChild(root);
+        }
     }
 
     @Override

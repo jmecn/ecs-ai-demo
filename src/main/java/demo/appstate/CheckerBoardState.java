@@ -21,7 +21,7 @@ import demo.Constants;
 
 public class CheckerBoardState extends BaseAppState implements ActionListener {
 
-    public final static String TOGGLE_AXIS = "toggle_axis";
+    public static final String TOGGLE_AXIS = "toggle_axis";
 
     private final Node rootNode = new Node("CheckerBoard");
 
