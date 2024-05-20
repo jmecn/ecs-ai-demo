@@ -34,38 +34,68 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.simsilica.bullet.debug;
+package demo.component;
 
 import com.simsilica.es.EntityComponent;
+import com.simsilica.es.EntityData;
+
 
 /**
- *  Status component used by the DebugPhysicsListener to communicate object
- *  status.
- *
+ *  The ID of the collision shape associated with some entity.
+ *  
  *  @author    Paul Speed
  */
-public class BodyDebugStatus implements EntityComponent {
+public class ShapeInfo implements EntityComponent {
 
-    public static final int STATIC = 0;
-    public static final int ACTIVE = 1;
-    public static final int INACTIVE = 2;
-    public static final int GHOST = 3;
+    private int id;
 
-    private int status;
-
-    protected BodyDebugStatus() {
-    }
-    
-    public BodyDebugStatus( int status ) {
-        this.status = status;
-    }
-    
-    public int getStatus() {
-        return status; 
+    protected ShapeInfo() {
     }
  
+    /**
+     *  Creates a new ShapeInfo component with the specified integer ID, usually
+     *  representing some specific string in the EntityData's string index.
+     */   
+    public ShapeInfo( int id ) {
+        this.id = id;
+    }
+ 
+    /**
+     *  Returns the integer ID of the collision shape associated with the 
+     *  entity to which this component applies.  Usually this is an ID in the
+     *  EntityData's strings table.
+     */   
+    public int getShapeId() {
+        return id; 
+    }
+ 
+    /**
+     *  Returns the shape ID name if it exists in the EntityData's string table.
+     */
+    public String getShapeName( EntityData ed ) {
+        return ed.getStrings().getString(id);
+    }
+ 
+    /**
+     *  Creates a ShapeInfo for the specified name by reusing or generating
+     *  a unique ID as required.
+     */   
+    public static ShapeInfo create( String name, EntityData ed ) {
+        return new ShapeInfo(ed.getStrings().getStringId(name, true));
+    }
+ 
+    /**
+     *  Returns the same string representation as toString() but if EntityData is
+     *  non-null then the ID will be resolved to a string.  If EntityData is null
+     *  then this is the same as calling toString().
+     */   
+    public String toString( EntityData ed ) {
+        String s = ed == null ? String.valueOf(id) : getShapeName(ed);
+        return getClass().getSimpleName() + "[" + s + "]";  
+    }
+    
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + status + "]";
+        return toString(null);
     } 
 }

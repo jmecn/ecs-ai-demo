@@ -52,8 +52,15 @@ public class AssetFactory {
         }
 
         switch (name) {
-            case Constants.BLUE_TEAM -> mat.getAdditionalRenderState().setPolyOffset(1f, 1f);
-            case Constants.DEBUG_SEGMENT, Constants.DEBUG_RADIUS -> mat.getAdditionalRenderState().setDepthTest(false);
+            case Constants.BLUE_TEAM: {
+                mat.getAdditionalRenderState().setPolyOffset(1f, 1f);
+                break;
+            }
+            case Constants.DEBUG_SEGMENT:
+            case Constants.DEBUG_RADIUS: {
+                mat.getAdditionalRenderState().setDepthTest(false);
+                break;
+            }
         }
 
         materials.put(name, mat);

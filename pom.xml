@@ -10,19 +10,15 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>8</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lombok.version>1.18.20</lombok.version>
         <guava.version>32.1.2-jre</guava.version>
-        <protobuf.version>3.9.0</protobuf.version>
-        <zxing.version>3.4.0</zxing.version>
         <jme3.version>3.6.1-stable</jme3.version>
         <lwjgl.version>3.3.2</lwjgl.version>
-        <minie.version>7.7.0+big3</minie.version>
-        <recast4j.version>1.5.6</recast4j.version>
     </properties>
 
     <dependencies>
@@ -47,19 +43,7 @@
         </dependency>
         <dependency>
             <groupId>org.jmonkeyengine</groupId>
-            <artifactId>jme3-effects</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jmonkeyengine</groupId>
             <artifactId>jme3-lwjgl3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jmonkeyengine</groupId>
-            <artifactId>jme3-plugins</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jmonkeyengine</groupId>
-            <artifactId>jme3-jogg</artifactId>
         </dependency>
 
         <!-- ecs -->
@@ -71,6 +55,18 @@
             <groupId>com.simsilica</groupId>
             <artifactId>sio2</artifactId>
             <exclusions>
+                <exclusion>
+                    <groupId>com.simsilica</groupId>
+                    <artifactId>lemur</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jmonkeyengine</groupId>
+                    <artifactId>jme3-networking</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.simsilica</groupId>
+                    <artifactId>zay-es-net</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-core</artifactId>
@@ -86,16 +82,6 @@
             </exclusions>
         </dependency>
 
-        <!-- lemur -->
-        <dependency>
-            <groupId>com.simsilica</groupId>
-            <artifactId>lemur</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-        </dependency>
-
         <!-- 日志 -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -104,54 +90,9 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>minie</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.github.stephengold</groupId>
-                    <artifactId>Minie</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jbullet</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jmonkeyengine</groupId>
-                    <artifactId>jme3-jbullet</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>bullet</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jmonkeyengine</groupId>
-                    <artifactId>jme3-bullet</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.jmonkeyengine</groupId>
-                    <artifactId>jme3-bullet-native</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -180,90 +121,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-effects</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-jogg</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-lwjgl</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
                 <artifactId>jme3-lwjgl3</artifactId>
                 <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-plugins</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-terrain</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-jbullet</artifactId>
-                <version>${jme3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-bullet</artifactId>
-                <version>3.3.2-stable</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jmonkeyengine</groupId>
-                <artifactId>jme3-bullet-native</artifactId>
-                <version>3.3.2-stable</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stephengold</groupId>
-                <artifactId>Minie</artifactId>
-                <version>${minie.version}</version>
-            </dependency>
-            <!-- Lemur GUI -->
-            <dependency>
-                <groupId>com.simsilica</groupId>
-                <artifactId>lemur</artifactId>
-                <version>1.16.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.simsilica</groupId>
-                <artifactId>lemur-proto</artifactId>
-                <version>1.13.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.simsilica</groupId>
-                <artifactId>lemur-props</artifactId>
-                <version>1.2.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayfella</groupId>
-                <artifactId>lemur-menubar</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayfella</groupId>
-                <artifactId>lemur-window</artifactId>
-                <version>1.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>3.0.8</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stephengold</groupId>
-                <artifactId>jme-ttf</artifactId>
-                <version>2.2.4</version>
             </dependency>
 
             <!-- zay ecs -->
@@ -280,11 +139,6 @@
 
             <dependency>
                 <groupId>com.simsilica</groupId>
-                <artifactId>jmec</artifactId>
-                <version>1.3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.simsilica</groupId>
                 <artifactId>sio2</artifactId>
                 <version>1.8.0</version>
             </dependency>
@@ -299,38 +153,6 @@
                 <version>1.6.0</version>
             </dependency>
 
-            <!-- recast4j -->
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>recast</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>detour</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>detour-crowd</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>detour-dynamic</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>detour-extras</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.recast4j</groupId>
-                <artifactId>detour-tile-cache</artifactId>
-                <version>${recast4j.version}</version>
-            </dependency>
-
             <!-- lombok -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -338,94 +160,10 @@
                 <version>${lombok.version}</version>
             </dependency>
 
-            <!-- jsoup -->
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>1.11.3</version>
-            </dependency>
-
-            <!-- Google -->
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.8.9</version>
-            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>javase</artifactId>
-                <version>${zxing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>core</artifactId>
-                <version>${zxing.version}</version>
-            </dependency>
-
-            <!-- Apache -->
-            <!-- Apache Commons -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-collections4</artifactId>
-                <version>4.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.8.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-pool2</artifactId>
-                <version>2.9.0</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>1.9.3</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.8.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jzlib</artifactId>
-                <version>1.1.3</version>
-            </dependency>
-
-            <!-- database stuff -->
-            <dependency>
-                <groupId>org.xerial</groupId>
-                <artifactId>sqlite-jdbc</artifactId>
-                <version>3.28.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>3.4.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>3.5.2</version>
             </dependency>
 
             <!-- logger -->
@@ -437,14 +175,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.2.9</version>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
+                <version>1.4.12</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

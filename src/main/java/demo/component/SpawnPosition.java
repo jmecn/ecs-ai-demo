@@ -34,37 +34,71 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package demo.system.bullet;
+package demo.component;
 
+import com.google.common.base.MoreObjects;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.simsilica.bullet.debug.PositionAdapter;
-import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;
-import demo.component.Transform;
+import com.simsilica.mathd.Quatd;
+import com.simsilica.mathd.Vec3d;
+
 
 /**
- *  
+ *  Represents the initial physical position of an entity.
  *
  *  @author    Paul Speed
  */
-public class PositionAdapterImpl implements PositionAdapter {
-
-    public PositionAdapterImpl() {
-    }
- 
-    @Override  
-    public Class<? extends EntityComponent> getComponentType() {
-        return Transform.class;
-    }
-        
-    @Override  
-    public Vector3f getLocation( Entity e, int status ) {
-        return e.get(Transform.class).getPosition();
+public class SpawnPosition implements EntityComponent {
+    private Vector3f location;
+    private Quaternion orientation;
+    
+    protected SpawnPosition() {
     }
     
-    @Override  
-    public Quaternion getOrientation( Entity e, int status ) {
-        return e.get(Transform.class).getRotation();
-    } 
+    public SpawnPosition( double x, double y, double z ) {
+        this(new Vector3f((float)x, (float)y, (float)z), new Quaternion());
+    }
+
+    public SpawnPosition( double x, double y, double z, Quatd orientation ) {
+        this(new Vector3f((float)x, (float)y, (float)z), orientation.toQuaternion());
+    }
+    
+    public SpawnPosition( Vector3f location ) {
+        this(location, new Quaternion());
+    }
+    
+    public SpawnPosition( Vec3d location, double facing ) {
+        this(location.toVector3f(), facing);
+    }
+
+    public SpawnPosition( Vec3d location, Quatd orientation ) {
+        this(location.toVector3f(), orientation.toQuaternion());
+    }
+    
+    public SpawnPosition( Vector3f location, double facing ) {
+        this(location, new Quaternion().fromAngles(0, (float)facing, 0));
+    }
+    
+    public SpawnPosition( Vector3f location, Quaternion orientation ) {
+        this.location = location;
+        this.orientation = orientation;
+    }
+  
+    public Vector3f getLocation() {
+        return location;
+    }
+    
+    public Quaternion getOrientation() {
+        return orientation;
+    }
+     
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(getClass().getSimpleName())
+            .omitNullValues()
+            .add("location", location)
+            .add("orientation", orientation)
+            .toString();
+    }
 }
